@@ -5,15 +5,8 @@
 #include <cstring> // for strcmp()
 #include <cstdlib> // for strtol() + strtof()
 #include <cmath> // for round()
+#include "student.h"
 using namespace std;
-
-struct Student{
-  // struct used for storing student values
-  char name1[81] = "Anita"; // first name
-  char name2[81] = "Jabłońskí"; // last name
-  int id = 123456; // ID
-  float gpa = 3.0; // GPA
-};
 
 namespace studentlist{
   // public objects for this program
@@ -45,10 +38,10 @@ void add_student(){
   char name1[81]; strcpy(name1, input("Enter the student's first name: ")); // does this break style? the function was already bulky so i wanted to combine like terms
   char name2[81]; strcpy(name2, input("Enter the student's last name: "));
   char* id = input("Enter the student ID: ");
-  int id1 = strtol(id, &pEnd, 10); // cast to int
+  static int id1 = strtol(id, &pEnd, 10); // cast to int
   char* gpa = input("Enter the student's GPA: ");
   float gpa1 = strtof(gpa, &pEnd); // cast to float
-  float gpa2 = round(100 * gpa1) / 100; // round to 2 decimal points
+  static float gpa2 = round(100 * gpa1) / 100; // round to 2 decimal points
   Student* student = new Student; // to keep it in memory after this scope ends; be sure to free this memory when it gets deleted
   strcpy(student->name1, name1);
   strcpy(student->name2, name2);
@@ -75,8 +68,9 @@ void print_students(){
 
 void delete_student(){
   // remove a student at a point
+  print_students();
   char* pEnd;
-  char* student = input("Enter the student position to delete: ");
+  char* student = input("Enter the student position in the array to delete: ");
   int student1 = strtol(student, &pEnd, 10) - 1; // cast to int
   Student* student2 = students.at(student1);
   cout << "Removing " << student2->name1 << ' ' << student2->name2 << "...\n" << flush;
