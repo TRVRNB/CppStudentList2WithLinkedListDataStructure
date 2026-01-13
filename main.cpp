@@ -6,16 +6,28 @@
 #include <cstdlib> // for strtol() + strtof()
 #include <cmath> // for round()
 #include "student.h"
+#include "node.h"
 using namespace std;
 
 namespace studentlist{
   // public objects for this program
   char version[20] = "1.0.1";
   vector<Student*> students;
-
+  Node* headptr; // this is the first in the linked list, and will not be printed or deleteable
+}
+using namespace studentlist;
+// NODE FUNCTIONS
+void add_student(Student*student){
+  Node* currentptr = studentlist::headptr;
+  while (currentptr->getNext() != nullptr){
+    currentptr = currentptr->getNext();
+  }
+  Node new_node(student);
+  Node* newptr = &new_node;
+  currentptr->setNext(newptr);
 }
 
-using namespace studentlist;
+// END OF NODE FUNCTIONS
 
 void print(const char* text = ""){
   // cout wrapper, similar to python print()

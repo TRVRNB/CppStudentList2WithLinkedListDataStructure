@@ -8,8 +8,8 @@ class Student {
   public:
     char* name1 = new char[81]; // first name
     char* name2 = new char[81]; // last name
-    int id; // ID
-    float gpa; // GPA 
+    int id = -42; // ID
+    float gpa = -21.00; // GPA 
     ~Student();
   private:
 
