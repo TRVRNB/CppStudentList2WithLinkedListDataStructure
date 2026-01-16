@@ -1,7 +1,6 @@
 // stores a list of students, their ID, and their GPA
 // has ADD, PRINT, DELETE, and HELP functions
 #include <iostream>
-#include <vector> // for vector data type
 #include <cstring> // for strcmp()
 #include <cstdlib> // for strtol() + strtof()
 #include <cmath> // for round()
@@ -12,21 +11,41 @@ using namespace std;
 namespace studentlist{
   // public objects for this program
   char version[20] = "1.0.1";
-  vector<Student*> students;
-  Node* headptr; // this is the first in the linked list, and will not be printed or deleteable
+  Node* headptr = new Node(nullptr); // this is the first in the linked list, and will not be printed or deleteable
 }
 using namespace studentlist;
 // NODE FUNCTIONS
-void add_student(Student*student){
-  Node* currentptr = studentlist::headptr;
-  while (currentptr->getNext() != nullptr){
-    currentptr = currentptr->getNext();
+Node* get_end(){
+  // returns the end of the linked list
+  Node* endptr = studentlist::headptr;
+  while (endptr->getNext() != nullptr){
+    endptr = endptr->getNext();
   }
-  Node new_node(student);
-  Node* newptr = &new_node;
-  currentptr->setNext(newptr);
+  return endptr;
 }
 
+void node_add_student(Student*student){
+  // adds student to the end of the linked list
+  Node* endptr = get_end();
+  Node* newptr = new Node(student);
+  endptr->setNext(newptr);
+}
+
+void print_remaining(Node*ptr, int i){
+  // prints the next node and all the nodes after it
+  if (ptr == nullptr){
+    return;
+  }
+  // this part only runs if the pointer exists
+  Student* student = ptr->getStudent();
+  cout << i << ") ";
+  cout << student->name1 << ' ' << student->name2 << ", ";
+  cout << student->id << ", ";
+  cout << student->gpa << "\n";
+  i++;
+  print_remaining(ptr->getNext(), i);
+
+}
 // END OF NODE FUNCTIONS
 
 void print(const char* text = ""){
@@ -38,9 +57,8 @@ void print(const char* text = ""){
 char* input(const char* text = ""){
   // cin wrapper, similar to python input()
   cout << text << flush;
-  char input[81]; // handle up to 80 chars
-  cin >> input;
-  char* input1 = input;
+  char* input1 = new char[81]; // handle up to 80 chars (dynamically allocate, i actually forgot what this meant on the test)
+  cin >> input1;
   return input1;
 }
 
@@ -50,16 +68,16 @@ void add_student(){
   char name1[81]; strcpy(name1, input("Enter the student's first name: ")); // does this break style? the function was already bulky so i wanted to combine like terms
   char name2[81]; strcpy(name2, input("Enter the student's last name: "));
   char* id = input("Enter the student ID: ");
-  static int id1 = strtol(id, &pEnd, 10); // cast to int
+  int id1 = strtol(id, &pEnd, 10); // cast to int
   char* gpa = input("Enter the student's GPA: ");
   float gpa1 = strtof(gpa, &pEnd); // cast to float
-  static float gpa2 = round(100 * gpa1) / 100; // round to 2 decimal points
+  float gpa2 = round(100 * gpa1) / 100; // round to 2 decimal points
   Student* student = new Student; // to keep it in memory after this scope ends; be sure to free this memory when it gets deleted
   strcpy(student->name1, name1);
   strcpy(student->name2, name2);
   student->id = id1; // id
   student->gpa = gpa2; // gpa
-  students.push_back(student); // finally, add this student to the vector
+  node_add_student(student);
   return;
 }
 
@@ -67,13 +85,8 @@ void print_students(){
   // print the students that are stored
   print("Student list:");
   short i = 1;
-  for (Student* student : students){
-    cout << i << ") ";
-    cout << student->name1 << ' ' << student->name2 << ", ";
-    cout << student->id << ", ";
-    cout << student->gpa << "\n";
-    ++i;
-  }
+  Node* ptr = studentlist::headptr;
+  print_remaining(headptr->getNext(), i);
   cout << flush;
   return;
 }
@@ -82,13 +95,18 @@ void delete_student(){
   // remove a student at a point
   print_students();
   char* pEnd;
-  char* student = input("Enter the student position in the array to delete: ");
-  int student1 = strtol(student, &pEnd, 10) - 1; // cast to int
-  Student* student2 = students.at(student1);
-  cout << "Removing " << student2->name1 << ' ' << student2->name2 << "...\n" << flush;
-  students.erase(students.begin() + student1); // remove it now
-  delete student2;
-  return;
+  char* indexstr = input("Enter the student position in the array to delete: ");
+  int index = strtol(indexstr, &pEnd, 10) - 1; // cast to int
+  Node* ptr = headptr->getNext();
+  Node* lastptr = headptr;
+  for (int i = 0; i < index; i++){ // stop at the right student
+    lastptr = ptr;
+    ptr = ptr->getNext();
+  }
+  Student* student = ptr->getStudent();
+  cout << "Removing " << student->name1 << "..." << endl;
+  lastptr->setNext(ptr->getNext());
+  delete ptr;
 }
   
 int main(){
