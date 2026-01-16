@@ -46,6 +46,19 @@ void print_remaining(Node*ptr, int i){
   print_remaining(ptr->getNext(), i);
 
 }
+
+float average(Node*ptr, float total, int count){
+  // add up the average and divide by count if it's the last one
+  if (ptr == nullptr){
+    if (count == 0){ // avoid division by 0
+      return 0;
+    }
+    float average = round((total / count) * 100) / 100;
+    return average;
+  }
+  total += ptr->getStudent()->gpa;
+  return average(ptr->getNext(), total, count+1);
+}
 // END OF NODE FUNCTIONS
 
 void print(const char* text = ""){
@@ -122,6 +135,7 @@ int main(){
       print("ADD: add a student");
       print("PRINT: print all the students currently stored");
       print("DELETE: delete a student");
+      print("AVERAGE: get GPA average");
     }
     if (strcmp(cmd, "QUIT") == 0){ // QUIT
       running = 0; // program will stop after completing this loop
@@ -135,6 +149,10 @@ int main(){
     }
     if (strcmp(cmd, "DELETE") == 0){ // DELETE
       delete_student();
+    }
+    if (strcmp(cmd, "AVERAGE") == 0){ // AVERAGE
+      float average1 = average(headptr->getNext(), 0, 0);
+      cout << average1 << endl;
     }
   }
   return 0;
