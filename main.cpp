@@ -107,7 +107,7 @@ void delete_student_with_id(Node* lastptr, Node* ptr, int id){
     delete ptr;
   } else {
     if (ptr->getNext() == nullptr){
-      cout << "Student not found.";
+      cout << "Student not found." << endl;
       return;
     }
     delete_student_with_id(ptr, ptr->getNext(), id);
