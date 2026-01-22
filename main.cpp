@@ -15,20 +15,14 @@ namespace studentlist{
 }
 using namespace studentlist;
 // NODE FUNCTIONS
-Node* get_end(){
-  // returns the end of the linked list
-  Node* endptr = studentlist::headptr;
-  while (endptr->getNext() != nullptr){
-    endptr = endptr->getNext();
-  }
-  return endptr;
-}
-
-void node_add_student(Student*student){
+void node_add_student(Student*student, Node*ptr){
   // adds student to the end of the linked list
-  Node* endptr = get_end();
-  Node* newptr = new Node(student);
-  endptr->setNext(newptr);
+  if (ptr->getNext() == nullptr){
+    Node* newptr = new Node(student);
+    ptr->setNext(newptr);
+  } else {
+    node_add_student(student, ptr->getNext());
+  }
 }
 
 void print_remaining(Node*ptr, int i){
@@ -90,7 +84,7 @@ void add_student(){
   strcpy(student->name2, name2);
   student->id = id1; // id
   student->gpa = gpa2; // gpa
-  node_add_student(student);
+  node_add_student(student, headptr); // new function
   return;
 }
 
@@ -104,22 +98,32 @@ void print_students(){
   return;
 }
 
+void delete_student_with_id(Node* lastptr, Node* ptr, int id){
+  // try to delete this student, or move on to the next
+  Student* student = ptr->getStudent();
+  if (student->id == id){
+    cout << "Removing " << student->name1 << ' ' << student->name2 << "..." << endl;
+    lastptr->setNext(ptr->getNext());
+    delete ptr;
+  } else {
+    if (ptr->getNext() == nullptr){
+      cout << "Student not found.";
+      return;
+    }
+    delete_student_with_id(ptr, ptr->getNext(), id);
+  }
+}
+
+
 void delete_student(){
   // remove a student at a point
   print_students();
   char* pEnd;
-  char* indexstr = input("Enter the student position in the array to delete: ");
-  int index = strtol(indexstr, &pEnd, 10) - 1; // cast to int
+  char* indexstr = input("Enter the student ID to delete: ");
+  int index = strtol(indexstr, &pEnd, 10); // cast to int
   Node* ptr = headptr->getNext();
   Node* lastptr = headptr;
-  for (int i = 0; i < index; i++){ // stop at the right student
-    lastptr = ptr;
-    ptr = ptr->getNext();
-  }
-  Student* student = ptr->getStudent();
-  cout << "Removing " << student->name1 << "..." << endl;
-  lastptr->setNext(ptr->getNext());
-  delete ptr;
+  delete_student_with_id(lastptr, ptr, index); // new function
 }
   
 int main(){
